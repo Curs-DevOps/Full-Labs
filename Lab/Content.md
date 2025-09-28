@@ -645,9 +645,7 @@ for i in {1..200}; do curl -s -o /dev/null http://localhost:8080/notes; done
 
 Then in Grafana you should start seeing metrics; in Jaeger you should see traces.
 
----
-
-## G. Homework (10%)
+**Homework 2 (10%)**
 
 * Add at least **two graphs** in Grafana: traffic (RPS) and latency (p95).
 * Create a short doc: how to reproduce the trace for one request and where to find it in Jaeger.
@@ -699,20 +697,42 @@ docker-compose -f docker-compose-sonar.yml up -d
 * Sonar UI: [http://localhost:9000](http://localhost:9000) (default admin/admin — change it)
 * Create a new project token in Sonar UI to be used by scanner.
 
-### B. Analyze a Maven project with Sonar
+### B. Analyze a Gradle project with Sonar and DependencyCheck
 
-In your `pom.xml`, add the Sonar Maven plugin or run the scanner directly:
-
-```bash
-# from project root
-mvn -DskipTests clean package sonar:sonar \
-  -Dsonar.host.url=http://localhost:9000 \
-  -Dsonar.login=<SONAR_TOKEN>
+Add to `build.gradle`:
 ```
+plugins {
+    ...
+    id 'org.sonarqube' version '4.3.0.3225' // SonarQube plugin
+    id 'org.owasp.dependencycheck' version '8.4.1' // Dependency-Check plugin
+}
+```
+
+To the bottom of `build.gradle`:
+```
+sonarqube {
+    properties {
+        property "sonar.projectKey", "notes-service"
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.login", System.getenv("SONAR_TOKEN") ?: "admin"
+        property "sonar.java.binaries", "$buildDir/classes/java/main"
+    }
+}
+
+dependencyCheck {
+    failBuildOnCVSS = 7.0 // fail build if any vuln >= 7.0
+    suppressionFile = 'dependency-check-suppressions.xml' // optional
+    analyzers.assemblyEnabled = false
+    format = 'ALL' // HTML, JSON, XML
+}
+```
+
+Run:
+`./gradlew clean build sonarqube dependencyCheckAnalyze`
 
 * Read the Sonar UI for issues, code smells, vulnerabilities, and fix them iteratively.
 
-### C. Snyk (local scanning)
+### C. Snyk - Optional (local scanning)
 
 Snyk requires creating a (free) account to get an auth token. Steps:
 
@@ -725,15 +745,19 @@ Snyk requires creating a (free) account to get an auth token. Steps:
      npm install -g snyk
      snyk auth   # follow link in terminal to authenticate
      ```
-3. Run a local test:
+3. Bottom of `build.gradle`:
+```
+task snykTest(type: Exec) {
+    commandLine 'snyk', 'test', '--all-projects'
+}
 
-   ```bash
-   # test dependencies of a Java project (Maven)
-   snyk test --org=<your-org-if-needed>
-   ```
-4. Optionally run `snyk monitor` to send results to Snyk web UI.
-
-**Alternative (no sign-up)**: use OWASP Dependency-Check or `mvn dependency:analyze` for basic local insights.
+task snykMonitor(type: Exec) {
+    commandLine 'snyk', 'monitor', '--all-projects'
+}
+```
+4. Run:
+  - `./gradlew snykTest` -> local testing with results in terminal
+  - `./gradlew snykMonitor` -> local testing with results in Snyk Cloud UI
 
 ---
 
@@ -765,14 +789,31 @@ int main() {
 `cpp-service/CMakeLists.txt`:
 
 ```cmake
-cmake_minimum_required(VERSION 3.10)
-project(cpp_service)
+cmake_minimum_required(VERSION 3.14)
+project(cppapp)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(cpp_service main.cpp)
+include(FetchContent)
 
-# If using additional libs, link here.
+# Fetch httplib (header-only)
+FetchContent_Declare(
+  httplib
+  GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
+  GIT_TAG        v0.26.0
+)
+
+FetchContent_MakeAvailable(httplib)
+
+add_executable(myapp app.cpp)
+
+# Add httplib include directory
+target_include_directories(myapp PRIVATE ${httplib_SOURCE_DIR})
+
+# Thread support
+find_package(Threads REQUIRED)
+target_link_libraries(myapp PRIVATE Threads::Threads)
 ```
 
 ### 3) Dockerfile for C++ service
@@ -823,26 +864,30 @@ System.out.println("from cpp: " + resp);
 version: '3.8'
 services:
   postgres:
-    image: postgres:13
+    image: postgres:14
     environment:
-      POSTGRES_USER: lab
-      POSTGRES_PASSWORD: lab
-      POSTGRES_DB: labdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: javalab
     ports: ["5432:5432"]
 
   vault:
-    image: vault:latest
-    environment:
-      VAULT_DEV_ROOT_TOKEN_ID: devroot
-    ports: ["8200:8200"]
-    command: "server -dev -dev-listen-address=0.0.0.0:8200"
+    image: hashicorp/vault:1.20.0
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./config:/vault/config.d
+      - vault-data:/vault/file
+    ports:
+      - "8200:8200"
+    command: server -config=/vault/config.d/vault.hcl
 
   cpp-service:
     build: ./cpp-service
     ports: ["8081:8081"]
 
-  java-api:
-    build: ./java-api
+  java-service:
+    build: ./java-service
     ports: ["8080:8080"]
     depends_on:
       - postgres
@@ -850,8 +895,6 @@ services:
       - vault
     environment:
       VAULT_ADDR: http://vault:8200
-      VAULT_TOKEN: devroot
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/labdb
 ```
 
 ### 2) Bring it up
@@ -863,11 +906,11 @@ docker-compose up --build
 ### 3) Verify
 
 * `curl http://localhost:8080/notes` (Java API) — Java will call `http://cpp-service:8081/hello` internally.
-* `docker-compose logs -f java-api` to follow logs.
+* `docker-compose logs -f java-service` to follow logs.
 
 ### 4) Service discovery & DNS
 
-* In Compose, service names act as DNS names. From `java-api` container you can reach `cpp-service:8081`.
+* In Compose, service names act as DNS names. From `java-service` container you can reach `cpp-service:8081`.
 
 ---
 
