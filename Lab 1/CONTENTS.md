@@ -19,7 +19,13 @@ They are lightweight, portable, and consistent across environments — *“it ru
 | Heavier (GBs) | Lightweight (MBs) |
 | Requires hypervisor | Uses container runtime |
 
-![Containers vs VMs diagram](https://www.docker.com/wp-content/uploads/2022/03/docker-containerized-applications-architecture.svg)
+<p align="center">
+  <img src="https://s7280.pcdn.co/wp-content/uploads/2018/07/containers-vs-virtual-machines.jpg"
+       alt="Container vs VM"
+       width="800"
+       style="border-radius: 12px;" />
+</p>
+
 
 ---
 
