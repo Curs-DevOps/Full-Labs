@@ -1,11 +1,10 @@
 ﻿
+
 # 🧪 Laboratory 1 – Introduction to Containers
 
 ## 🎯 Objective
 This first laboratory introduces **containerization** — one of the key building blocks of DevOps and Cloud Computing.  
 You’ll learn what containers are, why they’re useful, and how to set up a local environment using **Docker Hub** or **Podman**.
-
----
 
 ## 🧱 What Are Containers?
 
@@ -25,9 +24,6 @@ They are lightweight, portable, and consistent across environments — *“it ru
        width="800"
        style="border-radius: 12px;" />
 </p>
-
-
----
 
 ## 🐳 Option 1 – Using Docker Hub (+ Docker Desktop)
 
@@ -83,8 +79,6 @@ docker login
 ```
 Enter your Docker Hub username and password.
 
----
-
 ## 🦭 Option 2 – Using Podman (Docker-compatible alternative)
 
 [Podman](https://podman.io/) is a daemonless, open-source container engine that’s fully compatible with Docker CLI commands.
@@ -96,8 +90,6 @@ Enter your Docker Hub username and password.
 | Compatible with Docker CLI | ✅ | ✅ (alias) |
 
   <img src="https://raw.githubusercontent.com/containers/common/main/logos/podman-logo-full-vert.png" alt="Podman logo" width="220"/>
-
----
 
 ### 🔹 Installation – Windows
 1. Download the official MSI installer or use Winget:
@@ -114,8 +106,6 @@ Enter your Docker Hub username and password.
    podman machine start
    ```
 
----
-
 ### 🔹 Installation – macOS
 1. Use Homebrew:
    ```bash
@@ -130,8 +120,6 @@ Enter your Docker Hub username and password.
    ```bash
    podman run hello-world
    ```
-
----
 
 ### 🔹 Installation – Linux
 Podman is included in most distributions.
@@ -157,8 +145,6 @@ Verify:
 podman run hello-world
 ```
 
----
-
 ## ⚙️ Verify Your Setup
 
 Run this simple Nginx container to test networking and port mapping:
@@ -176,8 +162,6 @@ Then open your browser at:
 You should see the **Nginx welcome page**.
 
 ![Nginx welcome screen](https://upload.wikimedia.org/wikipedia/commons/c/c5/Nginx_default_index_page.png)
-
----
 
 ## 🧭 Lab Work
 
@@ -218,15 +202,11 @@ Try running a different image such as:
 
 Use `docker run -it image_name /bin/sh` to open an interactive shell inside the container.
 
----
-
 ## 🏁 Summary
 
 ✅ You now have a working container runtime (Docker or Podman).  
 ✅ You can pull images, run containers, and expose them to your browser.  
 ✅ You’ve run your first test using a real-world web server. 
-
----
 
 ## 📚 Homework
 
