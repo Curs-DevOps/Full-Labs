@@ -30,15 +30,6 @@ and how concurrency and I/O work together to serve multiple HTTP requests in par
 | 8 | [Testing & Debugging](#8-testing--debugging) | curl examples & thread logs |
 | 9 | [Optional Challenges](#9-optional-challenges) | For curious minds ✨ |
 
----
-
-<div align="center">
-  <button onclick="document.location='#3-building-a-simple-raw-server'">🚀 Jump to Coding</button>
-  <button onclick="document.location='#7-lab-tasks'">🧩 Go to Tasks</button>
-</div>
-
----
-
 ## 1. Introduction: From Lab 2 to Lab 3
 
 In **Lab 2**, we used Java’s built-in `HttpServer` — a convenient API that hides the internal details:
@@ -115,14 +106,6 @@ We’ll rebuild **the core of HttpServer manually**, piece by piece:
 | Threads | Auto-managed | `Executors.newFixedThreadPool(4)` |
 | Parsing | Automatic | Manual string parsing |
 | Storage | File-based `FileStudentStore` | Reused as-is ✅ |
-
----
-
-<div align="center">
-  <button onclick="document.location='#demo-mini-server'">▶️  Try the Mini Server</button>
-</div>
-
----
 
 <a id="demo-mini-server"></a>
 
