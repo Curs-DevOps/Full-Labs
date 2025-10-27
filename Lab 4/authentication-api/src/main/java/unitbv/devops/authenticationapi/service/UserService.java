@@ -1,0 +1,63 @@
+package unitbv.devops.authenticationapi.service;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import unitbv.devops.authenticationapi.dto.LoginRequest;
+import unitbv.devops.authenticationapi.dto.RegisterRequest;
+import unitbv.devops.authenticationapi.dto.UserResponse;
+import unitbv.devops.authenticationapi.user.Role;
+import unitbv.devops.authenticationapi.user.User;
+import unitbv.devops.authenticationapi.user.UserMapper;
+import unitbv.devops.authenticationapi.user.UserRepository;
+
+import java.time.Instant;
+import java.util.Optional;
+import java.util.Set;
+
+@Service
+public class UserService {
+
+    private final UserRepository users;
+    private final PasswordEncoder encoder;
+
+    public UserService(UserRepository users, PasswordEncoder encoder) {
+        this.users = users;
+        this.encoder = encoder;
+    }
+
+    public Optional<UserResponse> register(RegisterRequest req) {
+        if (users.existsByUsername(req.username()) || users.existsByEmail(req.email())) {
+            return Optional.empty();
+        }
+
+        User u = User.builder()
+                .username(req.username())
+                .email(req.email())
+                .passwordHash(encoder.encode(req.password()))
+                .roles(Set.of(Role.USER))
+                .createdAt(Instant.now())
+                .enabled(true)
+                .build();
+
+        u = users.save(u);
+        return Optional.of(UserMapper.toResponse(u));
+    }
+
+    public Optional<UserResponse> login(LoginRequest req) {
+        Optional<User> found = users.findByUsername(req.usernameOrEmail());
+        if (found.isEmpty()) {
+            found = users.findByEmail(req.usernameOrEmail());
+        }
+
+        if (found.isEmpty()) {
+            return Optional.empty();
+        }
+
+        User u = found.get();
+        if (!encoder.matches(req.password(), u.getPasswordHash())) {
+            return Optional.empty();
+        }
+
+        return Optional.of(UserMapper.toResponse(u));
+    }
+}

@@ -1,0 +1,9 @@
+[ {
+  "id" : "f480e10c-b44f-402c-a5ef-71e27f02e105",
+  "username" : "test",
+  "email" : "test@example.com",
+  "passwordHash" : "$2a$10$qO6qm42waXDYuR6UoAwr1u2GwQb/ToQYey1KKkHKZU6B5mrmoA8Ga",
+  "roles" : [ "USER" ],
+  "createdAt" : "2025-10-27T21:30:20.782563700Z",
+  "enabled" : true
+} ]
