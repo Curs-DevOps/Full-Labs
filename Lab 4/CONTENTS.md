@@ -75,8 +75,12 @@ classDiagram
     }
 
     class UserService {
+        <<interface>>
         +register(RegisterRequest): Optional<UserResponse>
         +login(LoginRequest): Optional<UserResponse>
+    }
+
+    class UserServiceImpl {
     }
 
     class UserRepository {
@@ -119,7 +123,8 @@ classDiagram
     }
 
     AuthController --> UserService
-    UserService --> UserRepository
+    UserServiceImpl --> UserRepository
+    UserServiceImpl ..|> UserService
     FileUserRepository ..|> UserRepository
     UserService --> User : uses
     UserService --> UserMapper : maps
@@ -314,8 +319,7 @@ authenticationapi
 ├─ config/ # Global configuration: security, swagger, encoder  
 ├─ controller/ # REST controllers (entry points to the API)  
 ├─ dto/ # Request & response models for controller endpoints  
-├─ service/ # Business logic for authentication  
-└─ user/ # Domain model + repository abstraction & implementation
+└─ user/ # User module - configs, service, repositories
 
 ```
 ✅ This structure aligns with Spring Boot’s recommended layered architecture
@@ -327,8 +331,7 @@ authenticationapi
 | `config` | Application-wide configurations | `SecurityConfig`, `PasswordConfig`, `OpenAPIConfig` |
 | `controller` | Handles HTTP requests only | `AuthController`, `HomeController` |
 | `dto` | Request / Response models | `RegisterRequest`, `LoginResponse`, `UserResponse`, `LoginRequest` |
-| `service` | Business logic and orchestration | `UserService` |
-| `user` | Domain model + persistence logic | `User`, `Role`, `UserRepository`, `FileUserRepository` |
+| `user` | Business logic and orchestration + Domain model + persistence logic | `User`, `Role`, `UserRepository`, `FileUserRepository` |
 
 ### 3.3 Architecture Overview (UML)
 
@@ -342,8 +345,12 @@ classDiagram
     }
 
     class UserService {
+        <<interface>>
         +register(RegisterRequest): Optional<UserResponse>
         +login(LoginRequest): Optional<UserResponse>
+    }
+
+    class UserServiceImpl {
     }
 
     class UserRepository {
@@ -1157,6 +1164,24 @@ public class AuthController {
     
 -   `401 Unauthorized` on invalid credentials
     
+### Global Exception Handler
+
+Use [Spring Boot Validation](https://www.baeldung.com/spring-boot-bean-validation) example:
+
+```java
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+@ExceptionHandler(MethodArgumentNotValidException.class)
+public Map<String, String> handleValidationExceptions(
+  MethodArgumentNotValidException ex) {
+    Map<String, String> errors = new HashMap<>();
+    ex.getBindingResult().getAllErrors().forEach((error) -> {
+        String fieldName = ((FieldError) error).getField();
+        String errorMessage = error.getDefaultMessage();
+        errors.put(fieldName, errorMessage);
+    });
+    return errors;
+}
+```
 
 ### Quick test checklist
 
