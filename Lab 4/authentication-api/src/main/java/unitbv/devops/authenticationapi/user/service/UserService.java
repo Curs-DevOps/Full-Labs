@@ -1,14 +1,15 @@
-package unitbv.devops.authenticationapi.service;
+package unitbv.devops.authenticationapi.user.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import unitbv.devops.authenticationapi.dto.LoginRequest;
-import unitbv.devops.authenticationapi.dto.RegisterRequest;
-import unitbv.devops.authenticationapi.dto.UserResponse;
-import unitbv.devops.authenticationapi.user.Role;
-import unitbv.devops.authenticationapi.user.User;
-import unitbv.devops.authenticationapi.user.UserMapper;
-import unitbv.devops.authenticationapi.user.UserRepository;
+
+import unitbv.devops.authenticationapi.dto.auth.LoginRequest;
+import unitbv.devops.authenticationapi.dto.auth.RegisterRequest;
+import unitbv.devops.authenticationapi.dto.auth.UserResponse;
+import unitbv.devops.authenticationapi.user.entity.Role;
+import unitbv.devops.authenticationapi.user.entity.User;
+import unitbv.devops.authenticationapi.user.mapper.UserMapper;
+import unitbv.devops.authenticationapi.user.repository.UserRepository;
 
 import java.time.Instant;
 import java.util.Optional;

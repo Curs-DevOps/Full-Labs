@@ -1,4 +1,4 @@
-package unitbv.devops.authenticationapi.user;
+package unitbv.devops.authenticationapi.user.config;
 
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;

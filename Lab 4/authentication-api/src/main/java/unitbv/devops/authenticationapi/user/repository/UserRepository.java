@@ -1,7 +1,9 @@
-package unitbv.devops.authenticationapi.user;
+package unitbv.devops.authenticationapi.user.repository;
 
 import java.util.List;
 import java.util.Optional;
+
+import unitbv.devops.authenticationapi.user.entity.User;
 
 public interface UserRepository {
     User save(User user);

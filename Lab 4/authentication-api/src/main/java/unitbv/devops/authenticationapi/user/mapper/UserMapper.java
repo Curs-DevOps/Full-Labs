@@ -1,8 +1,8 @@
-package unitbv.devops.authenticationapi.user;
+package unitbv.devops.authenticationapi.user.mapper;
 
-import unitbv.devops.authenticationapi.dto.UserResponse;
-import unitbv.devops.authenticationapi.user.Role;
-import unitbv.devops.authenticationapi.user.User;
+import unitbv.devops.authenticationapi.dto.auth.UserResponse;
+import unitbv.devops.authenticationapi.user.entity.Role;
+import unitbv.devops.authenticationapi.user.entity.User;
 
 import java.util.Set;
 import java.util.stream.Collectors;

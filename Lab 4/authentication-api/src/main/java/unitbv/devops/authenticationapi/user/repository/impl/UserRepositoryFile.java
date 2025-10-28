@@ -1,7 +1,12 @@
-package unitbv.devops.authenticationapi.user;
+package unitbv.devops.authenticationapi.user.repository.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import unitbv.devops.authenticationapi.user.config.UserStorageProperties;
+import unitbv.devops.authenticationapi.user.entity.User;
+import unitbv.devops.authenticationapi.user.repository.UserRepository;
+
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;

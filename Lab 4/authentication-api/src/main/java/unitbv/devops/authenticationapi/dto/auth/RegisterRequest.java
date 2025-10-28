@@ -1,4 +1,4 @@
-package unitbv.devops.authenticationapi.dto;
+package unitbv.devops.authenticationapi.dto.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

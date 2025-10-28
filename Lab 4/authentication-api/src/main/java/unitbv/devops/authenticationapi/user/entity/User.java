@@ -1,4 +1,4 @@
-package unitbv.devops.authenticationapi.user;
+package unitbv.devops.authenticationapi.user.entity;
 
 import lombok.*;
 

@@ -5,7 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import unitbv.devops.authenticationapi.dto.*;
-import unitbv.devops.authenticationapi.service.UserService;
+import unitbv.devops.authenticationapi.dto.auth.LoginRequest;
+import unitbv.devops.authenticationapi.dto.auth.LoginResponse;
+import unitbv.devops.authenticationapi.dto.auth.RegisterRequest;
+import unitbv.devops.authenticationapi.user.service.UserService;
 
 @RestController
 @RequestMapping("/api/auth")

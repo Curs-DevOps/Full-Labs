@@ -1,4 +1,4 @@
-package unitbv.devops.authenticationapi.dto;
+package unitbv.devops.authenticationapi.dto.auth;
 
 import java.time.Instant;
 import java.util.Set;
