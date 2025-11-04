@@ -118,20 +118,21 @@ Create a file named `docker-compose.yml` in the root of your project (same level
 ```yaml
 version: "3.8"
 services:
-	postgres:
-		image: postgres:16
-		container_name: auth-postgres
-		restart: always
-		environment:
-			POSTGRES_DB: authdb
-			POSTGRES_USER: authuser
-			POSTGRES_PASSWORD: authpass
-		ports:
-			- "5432:5432"
-		volumes:
-			- pgdata:/var/lib/postgresql/data
+  postgres:
+    image: postgres:16
+    container_name: auth-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: authuser
+      POSTGRES_PASSWORD: authpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
 volumes:
-	pgdata:
+  pgdata:
 ```
 
   
