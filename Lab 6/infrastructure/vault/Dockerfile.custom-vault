@@ -1,0 +1,24 @@
+# Use the official HashiCorp Vault image (which is Alpine-based)
+FROM hashicorp/vault:1.20
+
+# Install jq as requested
+RUN apk add --no-cache jq
+
+# Create directories for scripts and persistent data
+# These will be used by your scripts and mounted as volumes
+RUN mkdir -p /vault/scripts
+VOLUME /vault-keys /vault-creds
+
+# Copy all the necessary scripts into the image
+# (Assumes Dockerfile, init.sh, setup.sh, and custom-entrypoint.sh are in the same directory)
+COPY scripts/init.sh scripts/setup.sh custom-entrypoint.sh /vault/scripts/
+
+# Make all scripts executable
+RUN chmod +x /vault/scripts/*.sh
+
+# Set the new custom entrypoint
+ENTRYPOINT ["/vault/scripts/custom-entrypoint.sh"]
+
+# Use the default command from the base image
+# This will be passed as arguments ("$@") to our custom entrypoint
+CMD ["server"]

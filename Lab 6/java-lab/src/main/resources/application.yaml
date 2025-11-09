@@ -1,0 +1,54 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: java-lab
+
+  cloud:
+    vault:
+      application-name: java-lab
+      fail-fast: true
+      uri: ${SPRING_CLOUD_VAULT_URI:http://vault:8200}
+      connection-timeout: 5000
+      read-timeout: 15000
+      authentication: APPROLE
+      app-role:
+        role-id: ${VAULT_ROLE_ID}
+        secret-id: ${VAULT_SECRET_ID}
+        role: java-lab-role
+        app-role-path: approle
+      config:
+        lifecycle:
+          enabled: true
+          min-renewal: 10s
+          expiry-threshold: 1m
+      kv:
+        enabled: false
+      database:
+          enabled: true
+          role: java-lab-rw
+          backend: database
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/authdb}
+    username: ""
+    password: ""
+
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  config:
+    import: vault://
+
+logging:
+  level:
+    org.springframework.cloud.vault: DEBUG
+    org.springframework.vault: DEBUG
