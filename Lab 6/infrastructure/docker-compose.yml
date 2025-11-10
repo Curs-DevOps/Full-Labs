@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: authuser
+      POSTGRES_PASSWORD: authpass
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U authuser -d authdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  vault:
+    build:
+      context: vault
+      dockerfile: Dockerfile.custom-vault
+    container_name: vault
+    cap_add:
+      - IPC_LOCK
+    ports:
+      - "8200:8200"
+    networks:
+      - app-network
+    volumes:
+      - ./vault/config/:/vault/config
+      - vault-creds:/vault-creds
+      - vault-keys:/vault-keys
+
+  java-lab:
+    build: ../java-lab
+    container_name: java-lab
+    depends_on:
+      vault:
+        condition: service_started
+    environment:
+      SPRING_CLOUD_VAULT_URI: http://vault:8200
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/authdb
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    volumes:
+      - vault-creds:/vault-creds:ro
+      - ./java_lab/scripts:/scripts:ro
+
+networks:
+  app-network:
+
+volumes:
+  vault-creds:
+  vault-keys:
