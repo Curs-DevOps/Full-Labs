@@ -4,12 +4,12 @@
 
   // We'll use the host Docker socket
   "features": {
-    "ghcr.io/devcontainers/features/docker-cli:1": {}
+      "ghcr.io/devcontainers/features/docker-in-docker:1": {},
+      "ghcr.io/devcontainers/features/java:1": {
+        "version": 17
+      },
+      "ghcr.io/devcontainers-extra/features/maven-sdkman:2": {}
   },
-
-  "mounts": [
-    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
-  ],
 
   "customizations": {
     "vscode": {
