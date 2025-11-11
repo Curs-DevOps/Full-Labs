@@ -28,16 +28,20 @@ WORKDIR /app
 ARG INCLUDE_TLS=false
 
 # Copy certificate and create truststore
-COPY ./tls /tmp/tls
-RUN if [ "$INCLUDE_TLS" = "true" ] && [ -f /tmp/vault.crt ]; then \
-      echo "Importing TLS cert..."; \
-      keytool -import -trustcacerts -noprompt \
-        -alias vault \
-        -file /tmp/vault.crt \
-        -keystore /app/truststore.jks \
-        -storepass changeit && \
-      chown spring:spring /app/truststore.jks && \
-      rm /tmp/vault.crt; \
+RUN if [ "$INCLUDE_TLS" = "true" ]; then \
+      echo "Copying and importing TLS cert..."; \
+      if [ -d "tls" ]; then \
+        cp -r tls /tmp/; \
+        keytool -import -trustcacerts -noprompt \
+          -alias vault \
+          -file /tmp/tls/vault.crt \
+          -keystore /app/truststore.jks \
+          -storepass changeit; \
+        chown spring:spring /app/truststore.jks; \
+        rm /tmp/tls/vault.crt; \
+      else \
+        echo "TLS directory not found, skipping cert import."; \
+      fi; \
     else \
       echo "Skipping truststore build."; \
     fi
