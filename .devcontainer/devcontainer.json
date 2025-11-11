@@ -1,19 +1,18 @@
 {
   "name": "Docker + Compose DevContainer",
-  "dockerComposeFile": "docker-compose.yml",
-  "service": "dev",
-  "workspaceFolder": "/workspace",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
 
-  // Give the container privileges so it can run Docker inside it
-  "runArgs": ["--privileged"],
-
-  // Recommended features
+  // Enable Docker-in-Docker so you can run containers inside Codespaces
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/docker-compose:1": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
 
-  // Optional: additional VS Code extensions
+  "runArgs": ["--privileged"],
+
+  "mounts": [
+    "source=/var/lib/docker,target=/var/lib/docker,type=volume"
+  ],
+
   "customizations": {
     "vscode": {
       "extensions": [
@@ -22,11 +21,6 @@
     }
   },
 
-  // Persist Docker data between rebuilds
-  "mounts": [
-    "source=/var/lib/docker,target=/var/lib/docker,type=volume"
-  ],
-
-  "postCreateCommand": "docker version && docker compose version"
+  "postCreateCommand": "docker --version && docker compose version"
 }
 
