@@ -1,0 +1,24 @@
+# Git
+.git
+.gitignore
+
+# Node / tooling (in case you add later)
+node_modules
+npm-debug.log
+yarn.lock
+package-lock.json
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode
+.idea
+
+# Docker files
+Dockerfile
+docker-compose.yml
+
+# Logs
+*.log

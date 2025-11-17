@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sensor Monitoring Dashboard</title>
+
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <main>
+        <header>
+            <h1>Sensor Monitoring Dashboard</h1>
+            <p id="connectionStatus">Status: not connected</p>
+        </header>
+
+        <section id="controls">
+            <button id="startButton">Start Live Updates</button>
+            <button id="stopButton" disabled>Stop Live Updates</button>
+            <button id="refreshButton">Refresh Once</button>
+            <p id="lastUpdate">Last update: never</p>
+        </section>
+
+        <section id="sensorSection">
+            <h2>Sensor Data</h2>
+            <div>
+                <p>Sensor ID: <span id="sensorId">-</span></p>
+                <p>Status: <span id="sensorStatus">-</span></p>
+                <p>Temperature: <span id="sensorTemperature">-</span></p>
+                <p>Humidity: <span id="sensorHumidity">-</span></p>
+                <p>Timestamp: <span id="sensorTimestamp">-</span></p>
+            </div>
+        </section>
+
+        <section id="analyticsSection">
+            <h2>Analytics</h2>
+
+            <p>Analytics Status: <span id="analyticsStatus">-</span></p>
+
+            <div>
+                <h3>Statistics</h3>
+                <p>Average Temperature: <span id="avgTemperature">-</span></p>
+                <p>Min Temperature: <span id="minTemperature">-</span></p>
+                <p>Max Temperature: <span id="maxTemperature">-</span></p>
+
+                <p>Average Humidity: <span id="avgHumidity">-</span></p>
+                <p>Min Humidity: <span id="minHumidity">-</span></p>
+                <p>Max Humidity: <span id="maxHumidity">-</span></p>
+
+                <p>Total Readings: <span id="totalReadings">-</span></p>
+            </div>
+
+            <div>
+                <h3>Alerts</h3>
+                <ul id="alertsList"></ul>
+            </div>
+        </section>
+
+        <section id="errorSection">
+            <h2>Errors</h2>
+            <p id="errorMessage">None</p>
+        </section>
+    </main>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

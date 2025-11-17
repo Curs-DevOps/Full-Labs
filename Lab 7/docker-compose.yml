@@ -1,0 +1,74 @@
+services:
+  analytics:
+    build:
+      context: ./service-analytics
+      dockerfile: Dockerfile
+    container_name: analytics-service
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+    networks:
+      - sensor-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  sensor:
+    build:
+      context: ./service-sensor
+      dockerfile: Dockerfile
+    container_name: sensor-service
+    ports:
+      - "8080:8080"
+    networks:
+      - sensor-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: gateway-service
+    ports:
+      - "8081:8081"
+    networks:
+      - sensor-network
+    environment:
+      - SENSOR_SERVICE_URL=http://sensor-service:8080
+      - ANALYTICS_SERVICE_URL=http://analytics-service:5000
+    depends_on:
+      sensor:
+        condition: service_healthy
+      analytics:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/api/gateway/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-service
+    ports:
+      - "8082:80"
+    networks:
+      - sensor-network
+    depends_on:
+      gateway:
+        condition: service_healthy
+networks:
+  sensor-network:
+    driver: bridge
