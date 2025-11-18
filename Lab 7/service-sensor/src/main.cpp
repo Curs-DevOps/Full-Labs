@@ -1,19 +1,21 @@
-#include <iostream>
-#include <thread>
-#include <chrono>
-#include <ctime>
-#include <sstream>
-#include <cstring>
+#include <iostream> // For input/output operations (like std::cout, std::cerr)
+#include <thread>   // For creating and managing threads (to handle multiple clients)
+#include <chrono>   // For time-related functions (though not directly used for timing here)
+#include <ctime>    // For getting the current time (used for timestamping sensor data)
+#include <sstream>  // For string stream manipulation (used to build JSON and HTTP responses)
+#include <cstring>  // For C-style string manipulation (like memset for buffer)
 
+// Conditional includes for Windows vs. Linux/macOS socket programming
 #ifdef _WIN32
-    #include <winsock2.h>
-    #pragma comment(lib, "ws2_32.lib")
+    #include <winsock2.h> // Windows Sockets API header
+    #pragma comment(lib, "ws2_32.lib") // Link with the Winsock library
 #else
-    #include <sys/socket.h>
-    #include <netinet/in.h>
-    #include <unistd.h>
+    #include <sys/socket.h> // Standard socket definitions
+    #include <netinet/in.h> // Internet address family (AF_INET)
+    #include <unistd.h>     // For close() function (to close sockets)
 #endif
 
+// Structure to hold sensor data
 struct SensorData {
     double temperature;
     double humidity;
@@ -22,20 +24,25 @@ struct SensorData {
     std::string status;
 };
 
+// Class to simulate a sensor and generate data
 class Sensor {
 private:
-    double currentTemp;
-    double currentHumidity;
+    double currentTemp;     // Current temperature value
+    double currentHumidity; // Current humidity value
 
 public:
+    // Constructor: Initializes sensor with default values
     Sensor() : currentTemp(20.0), currentHumidity(50.0) {}
 
+    // Generates new sensor data with slight variations
     SensorData generateData() {
         SensorData data;
         
-        currentTemp += ((rand() % 100) - 50) / 100.0;
-        currentHumidity += ((rand() % 100) - 50) / 100.0;
+        // Simulate temperature and humidity fluctuations
+        currentTemp += ((rand() % 100) - 50) / 100.0; // +/- 0.5 degree
+        currentHumidity += ((rand() % 100) - 50) / 100.0; // +/- 0.5 percent
 
+        // Keep values within a realistic range
         if (currentTemp < 15.0) currentTemp = 15.0;
         if (currentTemp > 30.0) currentTemp = 30.0;
         if (currentHumidity < 30.0) currentHumidity = 30.0;
@@ -44,18 +51,21 @@ public:
         data.temperature = currentTemp;
         data.humidity = currentHumidity;
 
+        // Get current timestamp
         time_t now = time(0);
         data.timestamp = ctime(&now);
+        // Remove trailing newline character from ctime output
         if (!data.timestamp.empty() && data.timestamp.back() == '\n') {
             data.timestamp.pop_back();
         }
 
-        data.sensorId = "SENSOR-1";
-        data.status   = "OK";
+        data.sensorId = "SENSOR-1"; // Hardcoded sensor ID
+        data.status   = "OK";       // Hardcoded status
 
         return data;
     }
 
+    // Converts SensorData object to a JSON string
     std::string toJSON(const SensorData& data) {
         std::ostringstream json;
 
