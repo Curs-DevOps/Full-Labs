@@ -1,4 +1,3 @@
-﻿
 # WSL + Ubuntu + Docker (without Docker Desktop)
 ## Complete Student Guide – Step by Step
 
@@ -15,7 +14,7 @@ By the end of this lab, you will be able to run Docker containers directly insid
 ### 1.1 Open PowerShell as Administrator
 Start → type **PowerShell** → right-click → *Run as Administrator*
 
-### 1.2 Install WSL  
+### 1.2 Install WSL
 *(Run this in Windows PowerShell)*
 
 ```powershell

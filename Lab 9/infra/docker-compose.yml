@@ -1,0 +1,93 @@
+services:
+  collector:
+    container_name: collector
+    image: otel/opentelemetry-collector-contrib:latest
+    volumes:
+      - ./config/otel-collector.yml:/etc/otelcol-contrib/otel-collector.yml
+    command:
+      - --config=/etc/otelcol-contrib/otel-collector.yml
+    restart: always
+    ports:
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+      - "8889:8889" # Prometheus exporter metrics
+      - "8888:8888" # Collector metrics
+    networks:
+      - observability
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheusdata:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.enable-remote-write-receiver
+      - --web.enable-otlp-receiver
+      - --enable-feature=exemplar-storage
+      - --storage.tsdb.retention.time=15d
+    restart: always
+    ports:
+      - '9090:9090'
+    depends_on:
+      - collector
+    networks:
+      - observability
+
+  loki:
+    container_name: loki
+    restart: always
+    image: grafana/loki:latest
+    volumes:
+      - lokidata:/loki
+    ports:
+      - "3100:3100"
+    depends_on:
+      - collector
+    networks:
+      - observability
+
+  tempo:
+    container_name: tempo
+    restart: always
+    image: grafana/tempo:latest
+    volumes:
+      - ./config/tempo.yml:/etc/tempo.yml
+      - tempodata:/var/tempo
+    command:
+      - -config.file=/etc/tempo.yml
+    ports:
+      - "3200:3200"  # tempo
+      # 4317/4318 might conflict if exposed on host, but internal is fine.
+      # Tempo listens on 4317/4318 inside the container for OTLP push from collector.
+    networks:
+      - observability
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:latest
+    restart: always
+    volumes:
+      - ./config/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./config/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+      - ./config/dashboards/observability-dashboard.json:/etc/grafana/provisioning/dashboards/json/observability-dashboard.json
+      - grafanadata:/var/lib/grafana
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    ports:
+      - "3000:3000"
+    networks:
+      - observability
+
+volumes:
+  grafanadata:
+  prometheusdata:
+  lokidata:
+  tempodata:
+
+networks:
+  observability:
+    driver: bridge

@@ -1,0 +1,22 @@
+services:
+  app:
+    build: ./app
+    container_name: demo-app
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4318
+      - OTEL_SERVICE_NAME=demo-app
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_TRACES_EXPORTER=otlp
+      # Resource attributes to be useful in Grafana
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=demo-app,deployment.environment=development
+      - MANAGEMENT_OTLP_METRICS_EXPORT_URL=http://collector:4318/v1/metrics
+    ports:
+      - "8080:8080"
+    networks:
+      - observability
+
+networks:
+  observability:
+    name: infra_observability
+    external: true
