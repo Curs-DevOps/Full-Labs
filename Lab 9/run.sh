@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Starting Full Stack (Infra + App)..."
-docker-compose -p infra -f infra/docker-compose.yml up --build -d
+docker compose -p infra -f infra/docker-compose.yml up --build -d
 
 echo "Waiting for Grafana to be ready..."
 # Loop until Grafana health check returns 200 OK
@@ -11,4 +11,4 @@ done
 echo "Grafana is up!"
 
 # Start the app as a separate project, connecting to the same network
-docker-compose -p infra-app -f app-compose.yml up --build -d app
+docker compose -p infra-app -f app-compose.yml up --build -d app
